@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../models/habit.dart';
@@ -39,10 +40,69 @@ class HabitTile extends StatelessWidget {
             ),
             child: InkWell(
               onTap: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => HabitDetailScreen(habitId: habit.id),
-                  ),
+                showGeneralDialog(
+                  context: context,
+                  barrierDismissible: true,
+                  barrierLabel: 'Dismiss',
+                  barrierColor: Colors.black.withOpacity(0.3),
+                  transitionDuration: const Duration(milliseconds: 300),
+                  pageBuilder: (context, animation, secondaryAnimation) {
+                    return Stack(
+                      children: [
+                        // Blurred background - tappable to dismiss
+                        Positioned.fill(
+                          child: GestureDetector(
+                            onTap: () => Navigator.of(context).pop(),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                color: Colors.transparent,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Modal content
+                        Center(
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 48),
+                            child: Material(
+                              color: Colors.transparent,
+                              child: Container(
+                                constraints: BoxConstraints(
+                                  maxWidth: 600,
+                                  maxHeight:
+                                      MediaQuery.of(context).size.height * 0.85,
+                                ),
+                                decoration: BoxDecoration(
+                                  color:
+                                      Theme.of(context).scaffoldBackgroundColor,
+                                  borderRadius: BorderRadius.circular(24),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: HabitDetailScreen(habitId: habit.id),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                  transitionBuilder:
+                      (context, animation, secondaryAnimation, child) {
+                    return ScaleTransition(
+                      scale: Tween<double>(begin: 0.8, end: 1.0).animate(
+                        CurvedAnimation(
+                          parent: animation,
+                          curve: Curves.easeOutCubic,
+                        ),
+                      ),
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
+                      ),
+                    );
+                  },
                 );
               },
               borderRadius: BorderRadius.circular(16),
