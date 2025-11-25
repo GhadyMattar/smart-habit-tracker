@@ -72,7 +72,7 @@ class HabitTile extends StatelessWidget {
                                 constraints: BoxConstraints(
                                   maxWidth: 600,
                                   maxHeight:
-                                      MediaQuery.of(context).size.height * 0.85,
+                                      MediaQuery.of(context).size.height * 0.4,
                                 ),
                                 decoration: BoxDecoration(
                                   color:

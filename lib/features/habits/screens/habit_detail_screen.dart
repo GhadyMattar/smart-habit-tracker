@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
+
 import '../../../core/constants/app_colors.dart';
 
 import '../../../models/habit.dart';
@@ -47,24 +47,105 @@ class HabitDetailScreen extends StatelessWidget {
                   right: 16,
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         habit.title,
                         style: const TextStyle(
-                          fontSize: 20,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.white),
+                      icon: const Icon(Icons.close, color: Colors.white),
+                      onPressed: () => Navigator.pop(context),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Calendar Section
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            const columns = 24;
+                            const rows = 7;
+                            const gap = 4.0;
+                            final availableWidth = constraints.maxWidth;
+                            final itemSize =
+                                (availableWidth - (columns - 1) * gap) /
+                                    columns;
+
+                            // Calculate start date (Monday of the week 23 weeks ago)
+                            // 24 weeks total.
+                            final now = DateTime.now();
+                            // Assuming Row 0 is Monday
+                            final currentWeekday = now.weekday; // Mon=1...Sun=7
+                            final daysSinceMonday = currentWeekday - 1;
+                            final lastMonday =
+                                now.subtract(Duration(days: daysSinceMonday));
+                            final startDate = lastMonday
+                                .subtract(const Duration(days: 23 * 7));
+
+                            return Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: List.generate(columns, (colIndex) {
+                                return Column(
+                                  children: List.generate(rows, (rowIndex) {
+                                    final date = startDate.add(Duration(
+                                        days: (colIndex * 7) + rowIndex));
+
+                                    // Add margin for vertical spacing, except for the last row
+                                    final bottomMargin =
+                                        rowIndex == rows - 1 ? 0.0 : gap;
+
+                                    final isCompleted =
+                                        habit.isCompletedOn(date);
+
+                                    return Container(
+                                      width: itemSize,
+                                      height: itemSize,
+                                      margin:
+                                          EdgeInsets.only(bottom: bottomMargin),
+                                      decoration: BoxDecoration(
+                                        color: isCompleted
+                                            ? Color(habit.color)
+                                            : Color(habit.color)
+                                                .withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
+                                    );
+                                  }),
+                                );
+                              }),
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Footer Buttons
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.edit, color: Color(habit.color)),
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -75,7 +156,7 @@ class HabitDetailScreen extends StatelessWidget {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.white),
+                      icon: Icon(Icons.delete, color: Color(habit.color)),
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -105,122 +186,10 @@ class HabitDetailScreen extends StatelessWidget {
                   ],
                 ),
               ),
-              // Stats Section
-              Container(
-                color: Color(habit.color),
-                padding: const EdgeInsets.only(bottom: 32, left: 24, right: 24),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    _buildStatItem(
-                        'Streak', '${habit.currentStreak} days', Colors.white),
-                    _buildStatItem('Total', '${habit.completedDates.length}',
-                        Colors.white),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 24),
-
-              // Calendar Section
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: TableCalendar(
-                          firstDay: DateTime.utc(2024, 1, 1),
-                          lastDay: DateTime.utc(2030, 12, 31),
-                          focusedDay: DateTime.now(),
-                          calendarFormat: CalendarFormat.month,
-                          headerStyle: const HeaderStyle(
-                            formatButtonVisible: false,
-                            titleCentered: true,
-                          ),
-                          calendarBuilders: CalendarBuilders(
-                            defaultBuilder: (context, day, focusedDay) {
-                              if (habit.isCompletedOn(day)) {
-                                return Container(
-                                  margin: const EdgeInsets.all(6.0),
-                                  alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    color: Color(habit.color),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: Text(
-                                    day.day.toString(),
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                );
-                              }
-                              return null;
-                            },
-                            todayBuilder: (context, day, focusedDay) {
-                              // If today is completed, it will be handled by defaultBuilder logic if we check there too?
-                              // Actually todayBuilder overrides defaultBuilder for today.
-                              // So we need to check completion here too.
-                              final isCompleted = habit.isCompletedOn(day);
-                              return Container(
-                                margin: const EdgeInsets.all(6.0),
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: isCompleted
-                                      ? Color(habit.color)
-                                      : Colors.transparent,
-                                  shape: BoxShape.circle,
-                                  border: isCompleted
-                                      ? null
-                                      : Border.all(color: AppColors.primary),
-                                ),
-                                child: Text(
-                                  day.day.toString(),
-                                  style: TextStyle(
-                                    color: isCompleted
-                                        ? Colors.white
-                                        : AppColors.primary,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                          selectedDayPredicate: (day) =>
-                              false, // Disable selection
-                          onDaySelected: (selectedDay, focusedDay) {},
-                        ),
-                      ),
-                      const SizedBox(height: 24),
-                    ],
-                  ),
-                ),
-              ),
             ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildStatItem(String label, String value, Color color) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: color,
-          ),
-        ),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: color.withOpacity(0.8),
-          ),
-        ),
-      ],
     );
   }
 }
