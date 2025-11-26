@@ -111,9 +111,13 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bg = Theme.of(context).scaffoldBackgroundColor;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      backgroundColor: bg,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        toolbarHeight: 90,
         title: const Text(
           'Edit Habit',
           style: TextStyle(
@@ -121,9 +125,24 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                bg.withOpacity(1.0),
+                bg.withOpacity(0.0),
+              ],
+              stops: const [0.7, 1.0],
+            ),
+          ),
+        ),
       ),
       bottomNavigationBar: SafeArea(
         child: Padding(
@@ -152,7 +171,13 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: EdgeInsets.only(
+          top: 90 +
+              MediaQuery.of(context).padding.top, // Toolbar height + status bar
+          left: 24,
+          right: 24,
+          bottom: 24,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
