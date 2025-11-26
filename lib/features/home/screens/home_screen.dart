@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Hi, $firstName',
+                    'Hi, $firstName!',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,

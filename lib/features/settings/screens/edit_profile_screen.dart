@@ -36,6 +36,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  String _capitalizeFirstLetter(String text) {
+    if (text.isEmpty) return text;
+    return text[0].toUpperCase() + text.substring(1).toLowerCase();
+  }
+
   Future<void> _handleSave() async {
     if (!_formKey.currentState!.validate()) {
       return;
@@ -47,8 +52,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     try {
       final user = User(
-        firstName: _firstNameController.text.trim(),
-        lastName: _lastNameController.text.trim(),
+        firstName: _capitalizeFirstLetter(_firstNameController.text.trim()),
+        lastName: _capitalizeFirstLetter(_lastNameController.text.trim()),
       );
 
       final userProvider = Provider.of<UserProvider>(context, listen: false);
