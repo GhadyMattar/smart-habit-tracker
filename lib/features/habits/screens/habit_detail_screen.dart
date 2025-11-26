@@ -165,29 +165,38 @@ class HabitDetailScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             // Completion Checkbox
-                            Row(
-                              children: [
-                                Checkbox(
-                                  value: habit.isCompletedOn(DateTime.now()),
-                                  activeColor: Color(habit.color),
-                                  onChanged: (bool? value) {
-                                    provider.toggleHabit(
-                                        habit.id, DateTime.now());
-                                  },
-                                ),
-                                Text(
-                                  habit.isCompletedOn(DateTime.now())
-                                      ? 'Completed'
-                                      : 'Complete',
-                                  style: TextStyle(
-                                    color: habit.isCompletedOn(DateTime.now())
-                                        ? Colors.black
-                                        : Colors.grey,
-                                    fontWeight: FontWeight.bold,
+                            if (habit.isScheduledOn(DateTime.now()))
+                              Row(
+                                children: [
+                                  Checkbox(
+                                    value: habit.isCompletedOn(DateTime.now()),
+                                    activeColor: Color(habit.color),
+                                    onChanged: (bool? value) {
+                                      provider.toggleHabit(
+                                          habit.id, DateTime.now());
+                                    },
                                   ),
+                                  Text(
+                                    habit.isCompletedOn(DateTime.now())
+                                        ? 'Completed'
+                                        : 'Complete',
+                                    style: TextStyle(
+                                      color: habit.isCompletedOn(DateTime.now())
+                                          ? Colors.black
+                                          : Colors.grey,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              )
+                            else
+                              const Text(
+                                'Not scheduled today',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              ],
-                            ),
+                              ),
                             // Edit/Delete Buttons
                             Row(
                               children: [
