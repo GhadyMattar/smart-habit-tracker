@@ -15,6 +15,7 @@ class EditHabitScreen extends StatefulWidget {
 
 class _EditHabitScreenState extends State<EditHabitScreen> {
   late TextEditingController _titleController;
+  late TextEditingController _customCategoryController;
   late String _category;
   late int _selectedColor;
   late int _selectedIcon;
@@ -52,7 +53,17 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.habit.title);
-    _category = widget.habit.category;
+    _customCategoryController = TextEditingController();
+
+    // Check if category is in predefined list
+    if (_categories.contains(widget.habit.category)) {
+      _category = widget.habit.category;
+    } else {
+      // If custom category, set to 'Other' and populate custom field
+      _category = 'Other';
+      _customCategoryController.text = widget.habit.category;
+    }
+
     _selectedColor = widget.habit.color;
     _selectedIcon = widget.habit.iconCodePoint;
     _schedule = List.from(widget.habit.schedule);
@@ -70,6 +81,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   @override
   void dispose() {
     _titleController.dispose();
+    _customCategoryController.dispose();
     super.dispose();
   }
 
@@ -84,9 +96,16 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
   void _saveHabit() {
     if (_titleController.text.isEmpty) return;
 
+    // Determine final category: use custom if 'Other' is selected and custom text is provided
+    String finalCategory = _category;
+    if (_category == 'Other' &&
+        _customCategoryController.text.trim().isNotEmpty) {
+      finalCategory = _toTitleCase(_customCategoryController.text.trim());
+    }
+
     final updatedHabit = widget.habit.copyWith(
       title: _toTitleCase(_titleController.text.trim()),
-      category: _category,
+      category: finalCategory,
       color: _selectedColor,
       iconCodePoint: _selectedIcon,
       schedule: _schedule,
@@ -126,11 +145,15 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 90,
-        title: const Text(
-          'Edit Habit',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+        automaticallyImplyLeading: false, // Remove back button
+        title: const Padding(
+          padding: EdgeInsets.only(left: 8.0),
+          child: Text(
+            'Edit Habit',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -138,6 +161,15 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+        ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -236,6 +268,10 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
                     if (selected) {
                       setState(() {
                         _category = category;
+                        // Clear custom category if switching away from 'Other'
+                        if (category != 'Other') {
+                          _customCategoryController.clear();
+                        }
                       });
                     }
                   },
@@ -258,6 +294,28 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
                 );
               }).toList(),
             ),
+            // Custom category input (only shown when 'Other' is selected)
+            if (_category == 'Other') ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: _customCategoryController,
+                decoration: InputDecoration(
+                  hintText: 'Enter custom category',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.edit,
+                    color: AppColors.primary,
+                  ),
+                  contentPadding: const EdgeInsets.all(16),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Reminder Time

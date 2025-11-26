@@ -13,6 +13,7 @@ class AddHabitScreen extends StatefulWidget {
 
 class _AddHabitScreenState extends State<AddHabitScreen> {
   final _titleController = TextEditingController();
+  final _customCategoryController = TextEditingController();
   String _category = 'Health';
   int _selectedColor = 0xFF2196F3;
   int _selectedIcon = Icons.local_drink.codePoint;
@@ -21,9 +22,10 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
 
   final List<String> _categories = [
     'Health',
-    'Work',
-    'Study',
-    'Growth',
+    'Productivity',
+    'Mindfulness',
+    'Fitness',
+    'Learning',
     'Other'
   ];
   final List<int> _colors = [
@@ -56,10 +58,17 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
   void _saveHabit() {
     if (_titleController.text.isEmpty) return;
 
+    // Determine final category: use custom if 'Other' is selected and custom text is provided
+    String finalCategory = _category;
+    if (_category == 'Other' &&
+        _customCategoryController.text.trim().isNotEmpty) {
+      finalCategory = _toTitleCase(_customCategoryController.text.trim());
+    }
+
     final newHabit = Habit(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
       title: _toTitleCase(_titleController.text.trim()),
-      category: _category,
+      category: finalCategory,
       color: _selectedColor,
       iconCodePoint: _selectedIcon,
       schedule: _schedule,
@@ -95,11 +104,15 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 90,
-        title: const Text(
-          'New Habit',
-          style: TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
+        automaticallyImplyLeading: false, // Remove back button
+        title: const Padding(
+          padding: EdgeInsets.only(left: 8.0),
+          child: Text(
+            'New Habit',
+            style: TextStyle(
+              fontSize: 28,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         backgroundColor: Colors.transparent,
@@ -107,6 +120,15 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+        ],
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -202,6 +224,10 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                   onSelected: (selected) {
                     setState(() {
                       _category = category;
+                      // Clear custom category if switching away from 'Other'
+                      if (category != 'Other') {
+                        _customCategoryController.clear();
+                      }
                     });
                   },
                   selectedColor: AppColors.primary.withOpacity(0.2),
@@ -223,6 +249,27 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
                 );
               }).toList(),
             ),
+            // Custom category input (only shown when 'Other' is selected)
+            if (_category == 'Other') ...[
+              const SizedBox(height: 12),
+              TextField(
+                controller: _customCategoryController,
+                decoration: InputDecoration(
+                  hintText: 'Enter custom category',
+                  filled: true,
+                  fillColor: Colors.white,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide.none,
+                  ),
+                  prefixIcon: Icon(
+                    Icons.edit,
+                    color: AppColors.primary,
+                  ),
+                ),
+                textCapitalization: TextCapitalization.words,
+              ),
+            ],
             const SizedBox(height: 24),
 
             // Frequency
