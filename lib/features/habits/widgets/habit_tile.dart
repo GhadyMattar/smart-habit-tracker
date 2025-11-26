@@ -69,17 +69,6 @@ class HabitTile extends StatelessWidget {
                             child: Material(
                               color: Colors.transparent,
                               child: Container(
-                                constraints: BoxConstraints(
-                                  maxWidth: 600,
-                                  maxHeight:
-                                      MediaQuery.of(context).size.height * 0.4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
-                                  borderRadius: BorderRadius.circular(24),
-                                ),
-                                clipBehavior: Clip.antiAlias,
                                 child: HabitDetailScreen(habitId: habit.id),
                               ),
                             ),
