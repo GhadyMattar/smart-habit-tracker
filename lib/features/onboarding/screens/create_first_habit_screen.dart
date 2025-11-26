@@ -32,7 +32,7 @@ class CreateFirstHabitScreen extends StatelessWidget {
       backgroundColor: bg,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        toolbarHeight: 90,
+        toolbarHeight: 30,
         automaticallyImplyLeading: false,
         titleSpacing: 24,
         title: const Text(
@@ -69,7 +69,7 @@ class CreateFirstHabitScreen extends StatelessWidget {
 
           return Padding(
             padding: EdgeInsets.only(
-              top: 90 + MediaQuery.of(context).padding.top,
+              top: 10 + MediaQuery.of(context).padding.top,
               left: 24,
               right: 24,
               bottom: 24,
@@ -305,26 +305,52 @@ class CreateFirstHabitScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  // Continue button
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => _continueToApp(context),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: const StadiumBorder(),
-                        elevation: 2,
-                      ),
-                      child: const Text(
-                        'Continue to App',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text(
+                            'Back',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textSecondaryLight,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: BorderSide(
+                              color:
+                                  AppColors.textSecondaryLight.withOpacity(0.3),
+                              width: 2,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _continueToApp(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const StadiumBorder(),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            'Continue to App',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ] else ...[
                   // Empty state helper text

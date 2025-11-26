@@ -56,6 +56,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       backgroundColor: bg,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         toolbarHeight: 70,
         title: const Text(
           'History',
