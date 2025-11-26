@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../user/providers/user_provider.dart';
 import '../../../models/user.dart';
-import '../../home/screens/main_wrapper.dart';
+import 'create_first_habit_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -44,8 +44,9 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       await userProvider.saveUser(user);
 
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => const MainWrapper()),
+        Navigator.of(context).push(
+          MaterialPageRoute(
+              builder: (context) => const CreateFirstHabitScreen()),
         );
       }
     } catch (e) {
@@ -198,7 +199,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                               ),
                             )
                           : const Text(
-                              'Get Started',
+                              'Continue',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,

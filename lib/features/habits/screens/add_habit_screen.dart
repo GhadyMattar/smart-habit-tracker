@@ -45,12 +45,20 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
     Icons.language,
   ];
 
+  String _toTitleCase(String text) {
+    if (text.isEmpty) return text;
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word;
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
+
   void _saveHabit() {
     if (_titleController.text.isEmpty) return;
 
     final newHabit = Habit(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
-      title: _titleController.text,
+      title: _toTitleCase(_titleController.text.trim()),
       category: _category,
       color: _selectedColor,
       iconCodePoint: _selectedIcon,

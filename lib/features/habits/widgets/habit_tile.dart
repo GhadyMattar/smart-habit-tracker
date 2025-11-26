@@ -32,8 +32,8 @@ class HabitTile extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
+                  color: Colors.black.withOpacity(0.12),
+                  blurRadius: 15,
                   offset: const Offset(0, 4),
                 ),
               ],
