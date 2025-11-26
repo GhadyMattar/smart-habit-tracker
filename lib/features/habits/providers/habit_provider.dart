@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../../../models/habit.dart';
 
 class HabitProvider extends ChangeNotifier {
-  final List<Habit> _habits = [
+  // MOCK DATA - Commented out to test onboarding screen
+  final List<Habit> _habits = [];
+  /* final List<Habit> _habits = [
     Habit(
       id: '1',
       title: 'Drink Water',
@@ -37,12 +39,13 @@ class HabitProvider extends ChangeNotifier {
       order: 2,
       createdAt: DateTime.now().subtract(const Duration(days: 14)),
     ),
-  ];
+  ]; */
 
   HabitProvider() {
+    // MOCK DATA - Commented out to test onboarding screen
     // TEMPORARY: Populate with test data for development
     // Remove this line when you implement persistence
-    _populateTestData();
+    // _populateTestData();
   }
 
   // DEBUG METHOD: Populate habits with sample completion data
@@ -252,19 +255,18 @@ class HabitProvider extends ChangeNotifier {
         : null;
   }
 
-  Map<int, double> getWeeklyCompletionRate() {
-    final Map<int, double> data = {
-      1: 0.0,
-      2: 0.0,
-      3: 0.0,
-      4: 0.0,
-      5: 0.0,
-      6: 0.0,
-      7: 0.0
+  Map<int, double?> getWeeklyCompletionRate() {
+    final Map<int, double?> data = {
+      1: null,
+      2: null,
+      3: null,
+      4: null,
+      5: null,
+      6: null,
+      7: null
     };
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    //final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
     for (int i = 1; i <= 7; i++) {
       final date = startOfWeek.add(Duration(days: i - 1));
@@ -290,7 +292,7 @@ class HabitProvider extends ChangeNotifier {
       }).toList();
 
       if (scheduledHabits.isEmpty) {
-        data[i] = 0.0;
+        data[i] = null;
         continue;
       }
 

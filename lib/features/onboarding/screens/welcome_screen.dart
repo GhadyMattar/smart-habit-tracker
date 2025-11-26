@@ -188,9 +188,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                        shape: const StadiumBorder(),
                         elevation: 0,
                       ),
                       child: _isLoading

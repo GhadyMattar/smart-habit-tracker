@@ -117,8 +117,7 @@ class _EditHabitScreenState extends State<EditHabitScreen> {
 
     Provider.of<HabitProvider>(context, listen: false)
         .updateHabit(updatedHabit);
-    Navigator.pop(context); // Return to Detail
-    Navigator.pop(context); // Return to Home (optional, or stay in detail)
+    Navigator.pop(context); // Return to previous screen
     // Actually, better to pop once to Detail, and Detail will update because of Provider.
     // But DetailScreen might need to pop if we deleted it.
     // For Edit, we just pop once.

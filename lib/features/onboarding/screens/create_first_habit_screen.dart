@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../models/habit.dart';
 import '../../habits/providers/habit_provider.dart';
 import '../../habits/screens/add_habit_screen.dart';
+import '../../habits/screens/edit_habit_screen.dart';
 import '../../home/screens/main_wrapper.dart';
 
 class CreateFirstHabitScreen extends StatelessWidget {
@@ -33,6 +34,8 @@ class CreateFirstHabitScreen extends StatelessWidget {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         toolbarHeight: 90,
+        automaticallyImplyLeading: false,
+        titleSpacing: 24,
         title: const Text(
           'Create Your Habits',
           style: TextStyle(
@@ -61,7 +64,9 @@ class CreateFirstHabitScreen extends StatelessWidget {
       ),
       body: Consumer<HabitProvider>(
         builder: (context, habitProvider, child) {
-          final habits = habitProvider.habits;
+          // Filter out archived habits
+          final habits =
+              habitProvider.habits.where((h) => h.archivedAt == null).toList();
 
           return Padding(
             padding: EdgeInsets.only(
@@ -161,7 +166,7 @@ class CreateFirstHabitScreen extends StatelessWidget {
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 4),
 
                   // Habits List
                   Expanded(
@@ -169,64 +174,128 @@ class CreateFirstHabitScreen extends StatelessWidget {
                       itemCount: habits.length,
                       itemBuilder: (context, index) {
                         final habit = habits[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 12),
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.05),
-                                blurRadius: 8,
-                                offset: const Offset(0, 2),
+                        return GestureDetector(
+                          onTap: () {
+                            // Navigate to edit screen
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    EditHabitScreen(habit: habit),
+                                fullscreenDialog: true,
                               ),
-                            ],
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Color(habit.color).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(10),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.05),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
                                 ),
-                                child: Icon(
-                                  IconData(habit.iconCodePoint,
-                                      fontFamily: 'MaterialIcons'),
-                                  color: Color(habit.color),
-                                  size: 28,
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Color(habit.color).withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Icon(
+                                    IconData(habit.iconCodePoint,
+                                        fontFamily: 'MaterialIcons'),
+                                    color: Color(habit.color),
+                                    size: 28,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      habit.title,
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        habit.title,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
                                       ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        habit.category,
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: AppColors.textSecondaryLight,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                PopupMenuButton(
+                                  icon: Icon(
+                                    Icons.more_vert,
+                                    color: AppColors.textSecondaryLight,
+                                  ),
+                                  onSelected: (value) {
+                                    if (value == 'edit') {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) =>
+                                              EditHabitScreen(habit: habit),
+                                          fullscreenDialog: true,
+                                        ),
+                                      );
+                                    } else if (value == 'delete') {
+                                      // Show delete confirmation
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                          title: const Text('Delete Habit'),
+                                          content: Text(
+                                              'Are you sure you want to delete "${habit.title}"?'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () =>
+                                                  Navigator.pop(context),
+                                              child: const Text('Cancel'),
+                                            ),
+                                            TextButton(
+                                              onPressed: () {
+                                                Provider.of<HabitProvider>(
+                                                        context,
+                                                        listen: false)
+                                                    .deleteHabit(habit.id);
+                                                Navigator.pop(context);
+                                              },
+                                              child: const Text('Delete'),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  itemBuilder: (context) => [
+                                    const PopupMenuItem(
+                                      value: 'edit',
+                                      child: Text('Edit'),
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      habit.category,
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        color: AppColors.textSecondaryLight,
-                                      ),
+                                    const PopupMenuItem(
+                                      value: 'delete',
+                                      child: Text('Delete'),
                                     ),
                                   ],
                                 ),
-                              ),
-                              Icon(
-                                Icons.check_circle,
-                                color: AppColors.primary.withOpacity(0.5),
-                                size: 24,
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },
@@ -234,39 +303,95 @@ class CreateFirstHabitScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  OutlinedButton(
-                    onPressed: () => _continueToApp(context),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: BorderSide(color: AppColors.primary, width: 2),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    child: const Text(
-                      'Continue to App',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ] else
-                  // Empty state helper text
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 32),
-                    child: Center(
-                      child: Text(
-                        'Tap the button above to create your first habit',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: AppColors.textSecondaryLight,
-                          fontStyle: FontStyle.italic,
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => Navigator.pop(context),
+                          icon: const Icon(Icons.arrow_back),
+                          label: const Text(
+                            'Back',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.textSecondaryLight,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            side: BorderSide(
+                              color:
+                                  AppColors.textSecondaryLight.withOpacity(0.3),
+                              width: 2,
+                            ),
+                            shape: const StadiumBorder(),
+                          ),
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () => _continueToApp(context),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: const StadiumBorder(),
+                            elevation: 2,
+                          ),
+                          child: const Text(
+                            'Continue to App',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ] else ...[
+                  // Empty state helper text
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Tap the button above to create your first habit',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: AppColors.textSecondaryLight,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
+                  // Back button for empty state
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back),
+                      label: const Text(
+                        'Back',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.textSecondaryLight,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(
+                          color: AppColors.textSecondaryLight.withOpacity(0.3),
+                          width: 2,
+                        ),
+                        shape: const StadiumBorder(),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           );

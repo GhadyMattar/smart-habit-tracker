@@ -110,42 +110,23 @@ class _HistoryScreenState extends State<HistoryScreen> {
               provider.habits.any((h) => h.isCompletedOn(now));
 
           // Get first activity date
-          final firstActivityDate = provider.getFirstActivityDate();
+          // final firstActivityDate = provider.getFirstActivityDate();
 
-          // Calculate week start: use first activity date if it's in the current week
-          DateTime startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-
-          // Check if first activity date is in the current week
-          if (firstActivityDate != null) {
-            final mondayOfFirstWeek = firstActivityDate
-                .subtract(Duration(days: firstActivityDate.weekday - 1));
-            final sundayOfFirstWeek =
-                mondayOfFirstWeek.add(const Duration(days: 6));
-
-            // If today is in the same week as first activity, use first activity as start
-            if (now.isAfter(
-                    mondayOfFirstWeek.subtract(const Duration(days: 1))) &&
-                now.isBefore(sundayOfFirstWeek.add(const Duration(days: 1)))) {
-              startOfWeek = firstActivityDate;
-            }
-          }
-
-          final endOfWeek =
-              startOfWeek.add(Duration(days: 6 - (startOfWeek.weekday - 1)));
+          // Calculate week start: Always Monday of the current week
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          final endOfWeek = startOfWeek.add(const Duration(days: 6));
 
           // Calculate average completion rate (Sum of elapsed daily rates / elapsed days)
           double totalRate = 0;
           int daysToCount = 0;
 
-          // Count from start of tracked week to today
-          for (int i = startOfWeek.weekday;
-              i <=
-                  (startOfWeek == now.subtract(Duration(days: now.weekday - 1))
-                      ? now.weekday
-                      : 7);
-              i++) {
-            totalRate += weeklyRate[i] ?? 0.0;
-            daysToCount++;
+          // Count from Monday (1) to Today (now.weekday)
+          // This ignores future days in the average calculation
+          for (int i = 1; i <= now.weekday; i++) {
+            if (weeklyRate[i] != null) {
+              totalRate += weeklyRate[i]!;
+              daysToCount++;
+            }
           }
           final avgRate = daysToCount > 0 ? totalRate / daysToCount : 0.0;
 
@@ -451,23 +432,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               },
                             ),
                             borderData: FlBorderData(show: false),
-                            barGroups: weeklyRate.entries.where((e) {
-                              // Skip days before first activity in the first week
-                              if (firstActivityDate != null &&
-                                  startOfWeek !=
-                                      now.subtract(
-                                          Duration(days: now.weekday - 1))) {
-                                return e.key >= startOfWeek.weekday;
-                              }
-                              return true;
-                            }).map((e) {
+                            barGroups: weeklyRate.entries.map((e) {
                               final isSelected = e.key == now.weekday;
                               return BarChartGroupData(
                                 x: e.key,
                                 showingTooltipIndicators: isSelected ? [0] : [],
                                 barRods: [
                                   BarChartRodData(
-                                    toY: e.value,
+                                    toY: e.value ?? 0.0,
                                     color: isSelected
                                         ? AppColors.primary
                                         : Colors.grey[300],
