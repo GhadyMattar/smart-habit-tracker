@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../models/habit.dart';
 import '../../habits/providers/habit_provider.dart';
 import '../../habits/screens/add_habit_screen.dart';
 import '../../habits/screens/edit_habit_screen.dart';
@@ -166,11 +165,14 @@ class CreateFirstHabitScreen extends StatelessWidget {
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(
+                      height:
+                          2), // <-- Adjust this value to change spacing between title and habits
 
                   // Habits List
                   Expanded(
                     child: ListView.builder(
+                      padding: EdgeInsets.zero, // Remove default padding
                       itemCount: habits.length,
                       itemBuilder: (context, index) {
                         final habit = habits[index];
@@ -303,52 +305,26 @@ class CreateFirstHabitScreen extends StatelessWidget {
                   ),
 
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.arrow_back),
-                          label: const Text(
-                            'Back',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: AppColors.textSecondaryLight,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            side: BorderSide(
-                              color:
-                                  AppColors.textSecondaryLight.withOpacity(0.3),
-                              width: 2,
-                            ),
-                            shape: const StadiumBorder(),
-                          ),
+                  // Continue button
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => _continueToApp(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: const StadiumBorder(),
+                        elevation: 2,
+                      ),
+                      child: const Text(
+                        'Continue to App',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: () => _continueToApp(context),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 16),
-                            shape: const StadiumBorder(),
-                            elevation: 2,
-                          ),
-                          child: const Text(
-                            'Continue to App',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ] else ...[
                   // Empty state helper text
