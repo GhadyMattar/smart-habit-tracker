@@ -1,26 +1,47 @@
-//import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
-enum HabitType { boolean, quantity }
+part 'habit.g.dart';
 
+const Object _undefined = Object();
+
+@HiveType(typeId: 0)
+enum HabitType {
+  @HiveField(0)
+  boolean,
+  @HiveField(1)
+  quantity,
+}
+
+@HiveType(typeId: 1)
 class Habit {
+  @HiveField(0)
   final String id;
+  @HiveField(1)
   final String title;
+  @HiveField(2)
   final String category;
-  final int color; // Store as int (0xAARRGGBB)
-  final int iconCodePoint; // Store IconData codePoint
-  final List<int> schedule; // 1 = Mon, 7 = Sun
+  @HiveField(3)
+  final int color;
+  @HiveField(4)
+  final int iconCodePoint;
+  @HiveField(5)
+  final List<int> schedule;
+  @HiveField(6)
   final HabitType type;
-  final int target; // For quantity habits
-  final int order; // Position in the list for ordering
-  final DateTime?
-      reminderTime; // Notification time (TimeOfDay not serializable easily)
-  final List<DateTime>
-      completedDates; // For boolean: just dates. For quantity: could be complex, simplifying for now.
-
-  final DateTime createdAt; // Date when the habit was created
-  final DateTime? archivedAt; // Date when the habit was archived (soft deleted)
-  final List<Map<String, dynamic>>
-      scheduleHistory; // [{'start': DateTime, 'days': List<int>}]
+  @HiveField(7)
+  final int target;
+  @HiveField(8)
+  final int order;
+  @HiveField(9)
+  final DateTime? reminderTime;
+  @HiveField(10)
+  final List<DateTime> completedDates;
+  @HiveField(11)
+  final DateTime createdAt;
+  @HiveField(12)
+  final DateTime? archivedAt;
+  @HiveField(13)
+  final List<Map<String, dynamic>> scheduleHistory;
 
   Habit({
     required this.id,
@@ -43,19 +64,13 @@ class Habit {
               {'start': createdAt ?? DateTime.now(), 'days': schedule}
             ];
 
-  // Helper to check if completed on a specific date
   bool isCompletedOn(DateTime date) {
     return completedDates.any((d) =>
         d.year == date.year && d.month == date.month && d.day == date.day);
   }
 
-  // Helper to check if scheduled on a specific date using history
   bool isScheduledOn(DateTime date) {
-    // Normalize date to midnight
     final checkDate = DateTime(date.year, date.month, date.day);
-
-    // Find the schedule entry that was active on this date
-    // Sort history by start date descending to find the latest applicable one
     final sortedHistory = List<Map<String, dynamic>>.from(scheduleHistory)
       ..sort(
           (a, b) => (b['start'] as DateTime).compareTo(a['start'] as DateTime));
@@ -65,18 +80,15 @@ class Habit {
       final normalizedStart =
           DateTime(startDate.year, startDate.month, startDate.day);
 
-      // If the check date is on or after this schedule's start date, this is the one
       if (!checkDate.isBefore(normalizedStart)) {
         final days = List<int>.from(entry['days'] as List);
         return days.contains(checkDate.weekday);
       }
     }
 
-    // Fallback to current schedule if no history matches (shouldn't happen if initialized correctly)
     return schedule.contains(checkDate.weekday);
   }
 
-  // CopyWith for immutability
   Habit copyWith({
     String? id,
     String? title,
@@ -87,10 +99,10 @@ class Habit {
     HabitType? type,
     int? target,
     int? order,
-    DateTime? reminderTime,
+    Object? reminderTime = _undefined,
     List<DateTime>? completedDates,
     DateTime? createdAt,
-    DateTime? archivedAt,
+    Object? archivedAt = _undefined,
     List<Map<String, dynamic>>? scheduleHistory,
   }) {
     return Habit(
@@ -103,10 +115,13 @@ class Habit {
       type: type ?? this.type,
       target: target ?? this.target,
       order: order ?? this.order,
-      reminderTime: reminderTime ?? this.reminderTime,
+      reminderTime: reminderTime == _undefined
+          ? this.reminderTime
+          : reminderTime as DateTime?,
       completedDates: completedDates ?? this.completedDates,
       createdAt: createdAt ?? this.createdAt,
-      archivedAt: archivedAt ?? this.archivedAt,
+      archivedAt:
+          archivedAt == _undefined ? this.archivedAt : archivedAt as DateTime?,
       scheduleHistory: scheduleHistory ?? this.scheduleHistory,
     );
   }
@@ -115,60 +130,34 @@ class Habit {
     if (completedDates.isEmpty) return 0;
 
     final sortedDates = List<DateTime>.from(completedDates)
-      ..sort((a, b) => b.compareTo(a)); // Newest first
+      ..sort((a, b) => b.compareTo(a));
 
     if (sortedDates.isEmpty) return 0;
 
     int streak = 0;
     DateTime checkDate = DateTime.now();
-
-    // Normalize to start of day
     checkDate = DateTime(checkDate.year, checkDate.month, checkDate.day);
 
-    // Check if completed today
     if (isCompletedOn(checkDate)) {
       streak++;
       checkDate = checkDate.subtract(const Duration(days: 1));
     } else {
-      // If not completed today, check yesterday (streak might be active but not done today yet)
       final yesterday = checkDate.subtract(const Duration(days: 1));
       if (isCompletedOn(yesterday)) {
         checkDate = yesterday;
       } else {
-        return 0; // Streak broken
+        return 0;
       }
     }
 
-    // Count backwards
     while (true) {
-      // Find if checkDate is in history
       bool found = isCompletedOn(checkDate);
 
-      // If not found, check if it was a scheduled day
       if (!found) {
-        // If it was a scheduled day and not done -> streak broken
         if (schedule.contains(checkDate.weekday)) {
           break;
         }
-        // If not scheduled, skip this day and continue checking previous day
-        // (Streaks don't break on non-scheduled days)
-      } else {
-        // If found (and we already counted the first one if it was today/yesterday)
-        // We need to be careful not to double count if we already incremented
-        // But for the loop, we just check previous days.
       }
-
-      // Actually, a simpler approach for "daily" habits vs "scheduled" habits:
-      // For now, let's assume daily streak for simplicity, or strictly follow schedule.
-      // Let's stick to: Consecutive scheduled days completed.
-
-      // Re-implementation for strict scheduled days:
-      // 1. Get all past scheduled dates up to today/yesterday.
-      // 2. Check completion.
-
-      // Simplified version:
-      // Just count consecutive entries in sortedDates that are 1 day apart (ignoring non-scheduled days?)
-      // This is complex. Let's do a simple "Consecutive Days" streak for now.
 
       checkDate = checkDate.subtract(const Duration(days: 1));
       if (isCompletedOn(checkDate)) {

@@ -3,14 +3,23 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'models/habit.dart';
 import 'core/constants/app_colors.dart';
 import 'core/theme/theme_provider.dart';
 import 'features/habits/providers/habit_provider.dart';
 import 'features/user/providers/user_provider.dart';
 import 'features/onboarding/screens/splash_screen.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Hive
+  await Hive.initFlutter();
+  Hive.registerAdapter(HabitTypeAdapter());
+  Hive.registerAdapter(HabitAdapter());
+  await Hive.openBox<Habit>('habits');
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,

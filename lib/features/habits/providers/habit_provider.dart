@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import '../../../models/habit.dart';
 
 class HabitProvider extends ChangeNotifier {
   // MOCK DATA - Commented out to test onboarding screen
   final List<Habit> _habits = [];
+  late Box<Habit> _habitsBox;
   /* final List<Habit> _habits = [
     Habit(
       id: '1',
@@ -42,10 +44,21 @@ class HabitProvider extends ChangeNotifier {
   ]; */
 
   HabitProvider() {
-    // MOCK DATA - Commented out to test onboarding screen
-    // TEMPORARY: Populate with test data for development
-    // Remove this line when you implement persistence
-    // _populateTestData();
+    _habitsBox = Hive.box<Habit>('habits');
+    _loadHabits();
+  }
+
+  void _loadHabits() {
+    _habits.clear();
+    _habits.addAll(_habitsBox.values.toList());
+    notifyListeners();
+  }
+
+  Future<void> _saveHabits() async {
+    await _habitsBox.clear();
+    for (var habit in _habits) {
+      await _habitsBox.put(habit.id, habit);
+    }
   }
 
   // DEBUG METHOD: Populate habits with sample completion data
@@ -107,11 +120,11 @@ class HabitProvider extends ChangeNotifier {
   }
 
   void addHabit(Habit habit) {
-    // Assign next order value
     final maxOrder = _habits.isEmpty
         ? -1
         : _habits.map((h) => h.order).reduce((a, b) => a > b ? a : b);
     _habits.add(habit.copyWith(order: maxOrder + 1));
+    _saveHabits();
     notifyListeners();
   }
 
@@ -147,6 +160,7 @@ class HabitProvider extends ChangeNotifier {
       }
 
       _habits[index] = habit.copyWith(completedDates: updatedCompletedDates);
+      _saveHabits();
       notifyListeners();
     }
   }
@@ -171,6 +185,7 @@ class HabitProvider extends ChangeNotifier {
       }
 
       _habits[index] = habit.copyWith(archivedAt: DateTime.now());
+      _saveHabits();
       notifyListeners();
     }
   }
@@ -196,6 +211,7 @@ class HabitProvider extends ChangeNotifier {
       }
     }
 
+    _saveHabits();
     notifyListeners();
   }
 
@@ -216,6 +232,7 @@ class HabitProvider extends ChangeNotifier {
       }
 
       _habits[index] = habit.copyWith(completedDates: completedDates);
+      _saveHabits();
       notifyListeners();
     }
   }
