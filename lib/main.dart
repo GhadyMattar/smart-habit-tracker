@@ -34,13 +34,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-
     return MaterialApp(
       title: 'Smart Habit Tracker',
       scrollBehavior: CustomScrollBehavior(),
       debugShowCheckedModeBanner: false,
-      themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+      themeMode: ThemeMode.light,
       theme: ThemeData(
         brightness: Brightness.light,
         primaryColor: AppColors.primary,
@@ -51,24 +49,6 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light,
           primary: AppColors.primary,
           secondary: AppColors.secondary,
-        ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        brightness: Brightness.dark,
-        primaryColor: AppColors.primary,
-        scaffoldBackgroundColor: AppColors.backgroundDark,
-        textTheme:
-            GoogleFonts.openSansTextTheme(Theme.of(context).textTheme).apply(
-          bodyColor: AppColors.textPrimaryDark,
-          displayColor: AppColors.textPrimaryDark,
-        ),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          brightness: Brightness.dark,
-          primary: AppColors.primary,
-          secondary: AppColors.secondary,
-          surface: AppColors.surfaceDark,
         ),
         useMaterial3: true,
       ),

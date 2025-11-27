@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/theme/theme_provider.dart';
 import '../../user/providers/user_provider.dart';
 import 'edit_profile_screen.dart';
 
@@ -125,17 +124,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     setState(() {
                       _notificationsEnabled = value;
                     });
-                  },
-                  activeColor: AppColors.primary,
-                ),
-                const Divider(height: 1),
-                SwitchListTile(
-                  title: const Text('Dark Mode'),
-                  subtitle: const Text('Switch to dark theme'),
-                  value: Provider.of<ThemeProvider>(context).isDarkMode,
-                  onChanged: (value) {
-                    Provider.of<ThemeProvider>(context, listen: false)
-                        .toggleTheme(value);
                   },
                   activeColor: AppColors.primary,
                 ),

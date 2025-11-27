@@ -68,7 +68,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 24),
             const Text(
-              'Smart Habit Tracker',
+              'TrackMate',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 24,
