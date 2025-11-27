@@ -91,7 +91,17 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 320),
+              const SizedBox(height: 40),
+              // Image
+              Container(
+                height: 200,
+                alignment: Alignment.center,
+                child: Image.asset(
+                  'assets/images/welcome_image.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+              const SizedBox(height: 40),
               // Form
               Form(
                 key: _formKey,
