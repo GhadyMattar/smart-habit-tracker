@@ -216,6 +216,7 @@ class _AddHabitScreenState extends State<AddHabitScreen> {
             const SizedBox(height: 8),
             Wrap(
               spacing: 8,
+              runSpacing: 12,
               children: _categories.map((category) {
                 final isSelected = _category == category;
                 return ChoiceChip(

@@ -80,57 +80,18 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               const SizedBox(height: 60),
-              // App Icon/Logo
-              Container(
-                height: 100,
-                width: 100,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.check_circle_outline,
-                  size: 50,
-                  color: Colors.white,
-                ),
-              ),
-              const SizedBox(height: 40),
-              // Welcome Title
+              // Main Title
               Text(
-                'Welcome to Smart',
+                'Let\'s get to know\nyou better',
                 style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              Text(
-                'Habit Tracker',
-                style: TextStyle(
-                  fontSize: 32,
+                  fontSize: 40,
                   fontWeight: FontWeight.bold,
                   color: AppColors.primary,
+                  height: 1.2,
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Let\'s get to know you better',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondaryLight,
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 60),
+              const SizedBox(height: 320),
               // Form
               Form(
                 key: _formKey,

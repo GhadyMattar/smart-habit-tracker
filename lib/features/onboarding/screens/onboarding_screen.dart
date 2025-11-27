@@ -1,168 +1,96 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../home/screens/main_wrapper.dart';
+import 'welcome_screen.dart';
 
-class OnboardingScreen extends StatefulWidget {
+class OnboardingScreen extends StatelessWidget {
   const OnboardingScreen({super.key});
 
-  @override
-  State<OnboardingScreen> createState() => _OnboardingScreenState();
-}
-
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
-  final List<Map<String, String>> _pages = [
-    {
-      'title': AppStrings.onboardingTitle1,
-      'desc': AppStrings.onboardingDesc1,
-      'image': 'assets/images/onboarding1.png', // Placeholder
-    },
-    {
-      'title': AppStrings.onboardingTitle2,
-      'desc': AppStrings.onboardingDesc2,
-      'image': 'assets/images/onboarding2.png', // Placeholder
-    },
-    {
-      'title': AppStrings.onboardingTitle3,
-      'desc': AppStrings.onboardingDesc3,
-      'image': 'assets/images/onboarding3.png', // Placeholder
-    },
-  ];
-
-  Future<void> _completeOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isFirstLaunch', false);
-    if (!mounted) return;
+  void _getStarted(BuildContext context) {
     Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => const MainWrapper()),
+      MaterialPageRoute(builder: (context) => const WelcomeScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final textColor =
+        Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
+
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              child: PageView.builder(
-                controller: _pageController,
-                itemCount: _pages.length,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
-                },
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.all(32.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Placeholder for image
-                        Container(
-                          height: 250,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(
-                            Icons.image,
-                            size: 80,
-                            color: AppColors.primary.withOpacity(0.5),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
-                        Text(
-                          _pages[index]['title']!,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).textTheme.bodyLarge?.color,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          _pages[index]['desc']!,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color:
-                                Theme.of(context).textTheme.bodyMedium?.color,
-                            height: 1.5,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
+            const SizedBox(height: 64), // Increased top spacing
+            // Slogan
             Padding(
-              padding: const EdgeInsets.all(32.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  // Page Indicators
-                  Row(
-                    children: List.generate(
-                      _pages.length,
-                      (index) => AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        margin: const EdgeInsets.only(right: 8),
-                        height: 8,
-                        width: _currentPage == index ? 24 : 8,
-                        decoration: BoxDecoration(
-                          color: _currentPage == index
-                              ? AppColors.primary
-                              : AppColors.primary.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 56,
+                    fontWeight: FontWeight.w900,
+                    height: 1.1,
+                    fontFamily: 'Roboto',
                   ),
-                  // Button
-                  ElevatedButton(
-                    onPressed: () {
-                      if (_currentPage == _pages.length - 1) {
-                        _completeOnboarding();
-                      } else {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 16,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
-                      ),
+                  children: [
+                    TextSpan(
+                      text: 'GO FOR\n',
+                      style: TextStyle(color: textColor),
                     ),
-                    child: Text(
-                      _currentPage == _pages.length - 1
-                          ? AppStrings.getStarted
-                          : AppStrings.next,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    TextSpan(
+                      text: 'BETTER\nHABITS\n',
+                      style: TextStyle(color: AppColors.primary),
                     ),
-                  ),
-                ],
+                    TextSpan(
+                      text: 'WITH\nTRACKMATE',
+                      style: TextStyle(color: textColor),
+                    ),
+                  ],
+                ),
               ),
             ),
+
+            // Image - Expanded to fill available space
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                alignment: Alignment.centerRight, // Align to right
+                child: Image.asset(
+                  'assets/images/onboarding_image.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+
+            // Get Started Button
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _getStarted(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    elevation: 2,
+                  ),
+                  child: const Text(
+                    'Get Started',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 48), // Bottom spacing
           ],
         ),
       ),
