@@ -32,7 +32,7 @@ class CreateFirstHabitScreen extends StatelessWidget {
       backgroundColor: bg,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        toolbarHeight: 30,
+        toolbarHeight: 90,
         automaticallyImplyLeading: false,
         titleSpacing: 24,
         title: const Text(
@@ -165,9 +165,7 @@ class CreateFirstHabitScreen extends StatelessWidget {
                       color: Theme.of(context).textTheme.bodyLarge?.color,
                     ),
                   ),
-                  const SizedBox(
-                      height:
-                          2), // <-- Adjust this value to change spacing between title and habits
+                  const SizedBox(height: 16),
 
                   // Habits List
                   Expanded(

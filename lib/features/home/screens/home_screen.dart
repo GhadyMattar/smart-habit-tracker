@@ -215,10 +215,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   Column(
                     children: otherHabits.map((habit) {
                       final isCompleted = habit.isCompletedOn(_currentDate);
-                      return HabitTile(
-                        habit: habit,
-                        isCompleted: isCompleted,
-                        onToggle: null, // Disabled
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 16),
+                        child: HabitTile(
+                          habit: habit,
+                          isCompleted: isCompleted,
+                          onToggle: null, // Disabled
+                        ),
                       );
                     }).toList(),
                   ),
@@ -263,10 +266,13 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   const SizedBox(height: 16),
                   ...otherHabits.map((habit) {
                     final isCompleted = habit.isCompletedOn(_currentDate);
-                    return HabitTile(
-                      habit: habit,
-                      isCompleted: isCompleted,
-                      onToggle: null, // Disabled
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: HabitTile(
+                        habit: habit,
+                        isCompleted: isCompleted,
+                        onToggle: null, // Disabled
+                      ),
                     );
                   }),
                   const SizedBox(height: 24),
