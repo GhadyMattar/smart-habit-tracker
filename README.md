@@ -95,4 +95,4 @@ This project was developed as the final project for the **GIN528** course.
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by Ghady Mattar
