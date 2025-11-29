@@ -41,7 +41,7 @@ class Habit {
   @HiveField(12)
   final DateTime? archivedAt;
   @HiveField(13)
-  final List<Map<String, dynamic>> scheduleHistory;
+  final List<Map<String, dynamic>>? scheduleHistory;
 
   Habit({
     required this.id,
@@ -71,18 +71,21 @@ class Habit {
 
   bool isScheduledOn(DateTime date) {
     final checkDate = DateTime(date.year, date.month, date.day);
-    final sortedHistory = List<Map<String, dynamic>>.from(scheduleHistory)
-      ..sort(
-          (a, b) => (b['start'] as DateTime).compareTo(a['start'] as DateTime));
+    final history = scheduleHistory;
+    if (history != null) {
+      final sortedHistory = List<Map<String, dynamic>>.from(history)
+        ..sort((a, b) =>
+            (b['start'] as DateTime).compareTo(a['start'] as DateTime));
 
-    for (var entry in sortedHistory) {
-      final startDate = entry['start'] as DateTime;
-      final normalizedStart =
-          DateTime(startDate.year, startDate.month, startDate.day);
+      for (var entry in sortedHistory) {
+        final startDate = entry['start'] as DateTime;
+        final normalizedStart =
+            DateTime(startDate.year, startDate.month, startDate.day);
 
-      if (!checkDate.isBefore(normalizedStart)) {
-        final days = List<int>.from(entry['days'] as List);
-        return days.contains(checkDate.weekday);
+        if (!checkDate.isBefore(normalizedStart)) {
+          final days = List<int>.from(entry['days'] as List);
+          return days.contains(checkDate.weekday);
+        }
       }
     }
 

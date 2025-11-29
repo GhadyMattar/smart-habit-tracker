@@ -134,7 +134,8 @@ class HabitProvider extends ChangeNotifier {
       // Check if schedule changed
       if (habit.schedule.toString() != _habits[index].schedule.toString()) {
         // Add new schedule history entry
-        List<Map<String, dynamic>> history = List.from(habit.scheduleHistory);
+        List<Map<String, dynamic>> history =
+            List.from(habit.scheduleHistory ?? []);
         history.add({
           'start': DateTime.now(),
           'days': habit.schedule,
