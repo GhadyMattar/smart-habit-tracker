@@ -10,6 +10,7 @@ import 'core/theme/theme_provider.dart';
 import 'features/habits/providers/habit_provider.dart';
 import 'features/user/providers/user_provider.dart';
 import 'features/onboarding/screens/splash_screen.dart';
+import 'services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,10 @@ void main() async {
   Hive.registerAdapter(HabitTypeAdapter());
   Hive.registerAdapter(HabitAdapter());
   await Hive.openBox<Habit>('habits');
+
+  // Initialize Notifications
+  await NotificationService().init();
+  await NotificationService().requestPermissions();
 
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(

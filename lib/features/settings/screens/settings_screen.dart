@@ -12,8 +12,6 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool _notificationsEnabled = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -114,20 +112,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Column(
-              children: [
-                SwitchListTile(
-                  title: const Text('Notifications'),
-                  subtitle: const Text('Enable daily reminders'),
-                  value: _notificationsEnabled,
-                  onChanged: (value) {
-                    setState(() {
-                      _notificationsEnabled = value;
-                    });
-                  },
-                  activeColor: AppColors.primary,
-                ),
-              ],
+            child: Consumer<UserProvider>(
+              builder: (context, userProvider, child) {
+                return Column(
+                  children: [
+                    SwitchListTile(
+                      title: const Text('Notifications'),
+                      subtitle: const Text('Enable daily reminders'),
+                      value: userProvider.notificationsEnabled,
+                      onChanged: (value) {
+                        userProvider.setNotificationsEnabled(value);
+                      },
+                      activeColor: AppColors.primary,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           const SizedBox(height: 24),

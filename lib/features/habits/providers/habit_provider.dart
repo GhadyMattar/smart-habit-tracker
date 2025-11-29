@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../../../models/habit.dart';
+import '../../../services/notification_service.dart';
 
 class HabitProvider extends ChangeNotifier {
   // MOCK DATA - Commented out to test onboarding screen
@@ -123,8 +124,20 @@ class HabitProvider extends ChangeNotifier {
     final maxOrder = _habits.isEmpty
         ? -1
         : _habits.map((h) => h.order).reduce((a, b) => a > b ? a : b);
-    _habits.add(habit.copyWith(order: maxOrder + 1));
+    final newHabit = habit.copyWith(order: maxOrder + 1);
+    _habits.add(newHabit);
     _saveHabits();
+
+    // Schedule notification if needed
+    if (newHabit.reminderTime != null) {
+      NotificationService().scheduleReminder(
+        id: newHabit.id.hashCode,
+        title: 'Time for ${newHabit.title}!',
+        body: 'Don\'t forget to complete your habit.',
+        scheduledDate: newHabit.reminderTime!,
+      );
+    }
+
     notifyListeners();
   }
 
@@ -162,6 +175,21 @@ class HabitProvider extends ChangeNotifier {
 
       _habits[index] = habit.copyWith(completedDates: updatedCompletedDates);
       _saveHabits();
+
+      // Update notification
+      final notificationService = NotificationService();
+      // Always cancel old one first to be safe (or if time changed)
+      notificationService.cancelReminder(habit.id.hashCode);
+
+      if (habit.reminderTime != null) {
+        notificationService.scheduleReminder(
+          id: habit.id.hashCode,
+          title: 'Time for ${habit.title}!',
+          body: 'Don\'t forget to complete your habit.',
+          scheduledDate: habit.reminderTime!,
+        );
+      }
+
       notifyListeners();
     }
   }
@@ -187,6 +215,10 @@ class HabitProvider extends ChangeNotifier {
 
       _habits[index] = habit.copyWith(archivedAt: DateTime.now());
       _saveHabits();
+
+      // Cancel notification
+      NotificationService().cancelReminder(habit.id.hashCode);
+
       notifyListeners();
     }
   }
@@ -234,6 +266,58 @@ class HabitProvider extends ChangeNotifier {
 
       _habits[index] = habit.copyWith(completedDates: completedDates);
       _saveHabits();
+
+      // Handle notification logic
+      if (habit.reminderTime != null) {
+        final notificationService = NotificationService();
+        final now = DateTime.now();
+        final today = DateTime(now.year, now.month, now.day);
+
+        // Cancel existing notification first
+        notificationService.cancelReminder(habit.id.hashCode);
+
+        if (isCompleted) {
+          // If completed today, schedule for TOMORROW
+          // We use the original reminder time but set the date to tomorrow
+          final reminderTime = habit.reminderTime!;
+          final scheduledDate = DateTime(
+            today.year,
+            today.month,
+            today.day + 1,
+            reminderTime.hour,
+            reminderTime.minute,
+          );
+
+          notificationService.scheduleReminder(
+            id: habit.id.hashCode,
+            title: 'Time for ${habit.title}!',
+            body: 'Don\'t forget to complete your habit.',
+            scheduledDate: scheduledDate,
+          );
+        } else {
+          // If un-completed today, schedule for TODAY (if time hasn't passed) or TOMORROW
+          // Actually, we just schedule for "Today at ReminderTime".
+          // If that time has passed, the notification plugin (with matchDateTimeComponents)
+          // will automatically schedule it for the next occurrence (tomorrow).
+          // If it hasn't passed, it will schedule for today.
+          final reminderTime = habit.reminderTime!;
+          final scheduledDate = DateTime(
+            today.year,
+            today.month,
+            today.day,
+            reminderTime.hour,
+            reminderTime.minute,
+          );
+
+          notificationService.scheduleReminder(
+            id: habit.id.hashCode,
+            title: 'Time for ${habit.title}!',
+            body: 'Don\'t forget to complete your habit.',
+            scheduledDate: scheduledDate,
+          );
+        }
+      }
+
       notifyListeners();
     }
   }

@@ -17,10 +17,16 @@ class UserProvider extends ChangeNotifier {
     _loadUser();
   }
 
+  bool _notificationsEnabled = true;
+  bool get notificationsEnabled => _notificationsEnabled;
+
+  static const String _notificationsKey = 'notifications_enabled';
+
   Future<void> _loadUser() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final userJson = prefs.getString(_userKey);
+      _notificationsEnabled = prefs.getBool(_notificationsKey) ?? true;
 
       if (userJson != null) {
         final Map<String, dynamic> userMap = json.decode(userJson);
@@ -31,6 +37,17 @@ class UserProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  Future<void> setNotificationsEnabled(bool value) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_notificationsKey, value);
+      _notificationsEnabled = value;
+      notifyListeners();
+    } catch (e) {
+      debugPrint('Error saving notification settings: $e');
     }
   }
 
@@ -56,6 +73,8 @@ class UserProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(_userKey);
+      // We might want to keep notification settings even on logout, but let's keep it simple for now.
+      // Or maybe we should clear it? Let's leave it as is.
 
       _user = null;
       notifyListeners();
