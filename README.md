@@ -89,9 +89,9 @@ Contributions are welcome! If you find a bug or have a feature request, please o
 
 ---
 
-## 📄 License
+## 🎓 Final Project
 
-Distributed under the MIT License. See `LICENSE` for more information.
+This project was developed as the final project for the **GIN528** course.
 
 ---
 
