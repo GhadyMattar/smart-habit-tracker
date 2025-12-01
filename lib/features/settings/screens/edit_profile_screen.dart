@@ -157,7 +157,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(24.0),
+              padding: const EdgeInsets.only(
+                left: 24.0,
+                right: 24.0,
+                top: 24.0,
+                bottom: 50.0,
+              ),
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
