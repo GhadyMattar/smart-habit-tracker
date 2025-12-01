@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 
-class HeatmapCalendar extends StatelessWidget {
+class HeatmapCalendar extends StatefulWidget {
   final Map<DateTime, int> completionData;
   final int maxIntensity;
 
@@ -11,12 +11,38 @@ class HeatmapCalendar extends StatelessWidget {
     this.maxIntensity = 5,
   });
 
+  @override
+  State<HeatmapCalendar> createState() => _HeatmapCalendarState();
+}
+
+class _HeatmapCalendarState extends State<HeatmapCalendar> {
+  late DateTime _focusedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusedDay = DateTime.now();
+  }
+
+  void _onPreviousMonth() {
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
+    });
+  }
+
+  void _onNextMonth() {
+    setState(() {
+      _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
+    });
+  }
+
   Color _getColorForIntensity(int count, bool isCurrentMonth) {
-    if (count == 0)
+    if (count == 0) {
       return isCurrentMonth ? Colors.grey[200]! : Colors.grey[100]!;
+    }
 
     // Calculate intensity as percentage of max
-    final intensity = (count / maxIntensity).clamp(0.0, 1.0);
+    final intensity = (count / widget.maxIntensity).clamp(0.0, 1.0);
 
     final baseOpacity = isCurrentMonth ? 1.0 : 0.4;
 
@@ -34,9 +60,8 @@ class HeatmapCalendar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final now = DateTime.now();
-    final currentMonth = now.month;
-    final currentYear = now.year;
+    final currentMonth = _focusedDay.month;
+    final currentYear = _focusedDay.year;
 
     // First day of the current month
     final firstDayOfMonth = DateTime(currentYear, currentMonth, 1);
@@ -61,6 +86,36 @@ class HeatmapCalendar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Header with Navigation
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              onPressed: _onPreviousMonth,
+              icon: const Icon(Icons.chevron_left),
+              color: AppColors.textSecondaryLight,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+            Text(
+              '${_getMonthName(currentMonth)} $currentYear',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimaryLight,
+              ),
+            ),
+            IconButton(
+              onPressed: _onNextMonth,
+              icon: const Icon(Icons.chevron_right),
+              color: AppColors.textSecondaryLight,
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
+            ),
+          ],
+        ),
+        const SizedBox(height: 16),
+
         // Day labels
         Row(
           children: const [
@@ -129,7 +184,7 @@ class HeatmapCalendar extends StatelessWidget {
                   );
 
                   final isCurrentMonth = currentDate.month == currentMonth;
-                  final count = completionData[DateTime(
+                  final count = widget.completionData[DateTime(
                         currentDate.year,
                         currentDate.month,
                         currentDate.day,
