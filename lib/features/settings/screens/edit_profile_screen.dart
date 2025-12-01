@@ -97,68 +97,76 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         foregroundColor: Theme.of(context).textTheme.bodyLarge?.color,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                const SizedBox(height: 20),
-                // First Name Field
-                TextFormField(
-                  controller: _firstNameController,
-                  decoration: InputDecoration(
-                    labelText: 'First Name',
-                    hintText: 'Enter your first name',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
+        child: Column(
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const SizedBox(height: 20),
+                      // First Name Field
+                      TextFormField(
+                        controller: _firstNameController,
+                        decoration: InputDecoration(
+                          labelText: 'First Name',
+                          hintText: 'Enter your first name',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      // Last Name Field
+                      TextFormField(
+                        controller: _lastNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Last Name',
+                          hintText: 'Enter your last name',
+                          prefixIcon: const Icon(Icons.person_outline),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          filled: true,
+                          fillColor: Colors.white,
+                        ),
+                        textCapitalization: TextCapitalization.words,
+                        validator: (value) {
+                          if (value == null || value.trim().isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
                   ),
-                  textCapitalization: TextCapitalization.words,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your first name';
-                    }
-                    return null;
-                  },
                 ),
-                const SizedBox(height: 20),
-                // Last Name Field
-                TextFormField(
-                  controller: _lastNameController,
-                  decoration: InputDecoration(
-                    labelText: 'Last Name',
-                    hintText: 'Enter your last name',
-                    prefixIcon: const Icon(Icons.person_outline),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white,
-                  ),
-                  textCapitalization: TextCapitalization.words,
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Please enter your last name';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 40),
-                // Save Button
-                ElevatedButton(
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
                   onPressed: _isLoading ? null : _handleSave,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                    shape: const StadiumBorder(),
                     elevation: 0,
                   ),
                   child: _isLoading
@@ -179,9 +187,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           ),
                         ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );
