@@ -7,42 +7,6 @@ class HabitProvider extends ChangeNotifier {
   // MOCK DATA - Commented out to test onboarding screen
   final List<Habit> _habits = [];
   late Box<Habit> _habitsBox;
-  /* final List<Habit> _habits = [
-    Habit(
-      id: '1',
-      title: 'Drink Water',
-      category: 'Health',
-      color: 0xFF2196F3, // Blue
-      iconCodePoint: Icons.local_drink.codePoint,
-      schedule: [1, 2, 3, 4, 5, 6, 7], // Daily
-      type: HabitType.quantity,
-      target: 8,
-      order: 0,
-      createdAt: DateTime.now().subtract(const Duration(days: 14)),
-    ),
-    Habit(
-      id: '2',
-      title: 'Read Book',
-      category: 'Growth',
-      color: 0xFF9C27B0, // Purple
-      iconCodePoint: Icons.book.codePoint,
-      schedule: [1, 2, 3, 4, 5], // Weekdays
-      type: HabitType.boolean,
-      order: 1,
-      createdAt: DateTime.now().subtract(const Duration(days: 14)),
-    ),
-    Habit(
-      id: '3',
-      title: 'Morning Jog',
-      category: 'Health',
-      color: 0xFF4CAF50, // Green
-      iconCodePoint: Icons.directions_run.codePoint,
-      schedule: [1, 3, 5], // Mon, Wed, Fri
-      type: HabitType.boolean,
-      order: 2,
-      createdAt: DateTime.now().subtract(const Duration(days: 14)),
-    ),
-  ]; */
 
   HabitProvider() {
     _habitsBox = Hive.box<Habit>('habits');
@@ -51,6 +15,16 @@ class HabitProvider extends ChangeNotifier {
 
   void _loadHabits() {
     _habits.clear();
+    // Uncomment to generate mock data if box is empty
+    /*
+    if (_habitsBox.isEmpty) {
+      _generateMockHabits();
+      _populateTestData();
+      _saveHabits();
+    } else {
+      _habits.addAll(_habitsBox.values.toList());
+    }
+    */
     _habits.addAll(_habitsBox.values.toList());
     notifyListeners();
   }
@@ -62,12 +36,73 @@ class HabitProvider extends ChangeNotifier {
     }
   }
 
+  void _generateMockHabits() {
+    _habits.addAll([
+      Habit(
+        id: '1',
+        title: 'Drink Water',
+        category: 'Health',
+        color: 0xFF2196F3, // Blue
+        iconCodePoint: Icons.local_drink.codePoint,
+        schedule: [1, 2, 3, 4, 5, 6, 7], // Daily
+        type: HabitType.quantity,
+        target: 8,
+        order: 0,
+        createdAt: DateTime.now().subtract(const Duration(days: 60)),
+      ),
+      Habit(
+        id: '2',
+        title: 'Read Book',
+        category: 'Growth',
+        color: 0xFF9C27B0, // Purple
+        iconCodePoint: Icons.book.codePoint,
+        schedule: [1, 2, 3, 4, 5], // Weekdays
+        type: HabitType.boolean,
+        order: 1,
+        createdAt: DateTime.now().subtract(const Duration(days: 60)),
+      ),
+      Habit(
+        id: '3',
+        title: 'Morning Jog',
+        category: 'Health',
+        color: 0xFF4CAF50, // Green
+        iconCodePoint: Icons.directions_run.codePoint,
+        schedule: [1, 3, 5], // Mon, Wed, Fri
+        type: HabitType.boolean,
+        order: 2,
+        createdAt: DateTime.now().subtract(const Duration(days: 60)),
+      ),
+      Habit(
+        id: '4',
+        title: 'Meditation',
+        category: 'Wellness',
+        color: 0xFFFF9800, // Orange
+        iconCodePoint: Icons.self_improvement.codePoint,
+        schedule: [1, 2, 3, 4, 5, 6, 7], // Daily
+        type: HabitType.boolean,
+        order: 3,
+        createdAt: DateTime.now().subtract(const Duration(days: 60)),
+      ),
+      Habit(
+        id: '5',
+        title: 'Code',
+        category: 'Work',
+        color: 0xFF607D8B, // Blue Grey
+        iconCodePoint: Icons.code.codePoint,
+        schedule: [1, 2, 3, 4, 5], // Weekdays
+        type: HabitType.boolean,
+        order: 4,
+        createdAt: DateTime.now().subtract(const Duration(days: 60)),
+      ),
+    ]);
+  }
+
   // DEBUG METHOD: Populate habits with sample completion data
   void _populateTestData() {
     final now = DateTime.now();
 
-    // Add completions for the past 14 days
-    for (int i = 13; i >= 0; i--) {
+    // Add completions for the past 60 days
+    for (int i = 59; i >= 0; i--) {
       final date = now.subtract(Duration(days: i));
 
       // Complete habits based on their schedule and some randomness
@@ -75,8 +110,8 @@ class HabitProvider extends ChangeNotifier {
         // Check if this day is in the habit's schedule
         if (habit.schedule.contains(date.weekday)) {
           // Complete 80% of scheduled habits (simulate realistic usage)
-          if (i % 3 != 0 || i == 0) {
-            // Skip every 3rd day to simulate missing some
+          if (i % 5 != 0) {
+            // Skip every 5th day to simulate missing some (80% success rate)
             _toggleHabitForDate(habit.id, date);
           }
         }
