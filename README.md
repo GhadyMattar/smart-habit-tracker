@@ -18,7 +18,6 @@ A modern, beautiful, and feature-rich habit tracking application built with Flut
 -   **🔔 Smart Reminders**:
     -   Get notified when it's time to complete a habit.
     -   **Smart Logic**: Reminders are automatically skipped if you've already completed the habit for the day.
--   **🌗 Dark/Light Mode**: Beautifully designed themes that adapt to your preference.
 -   **💾 Local Data Persistence**: Your data is safe and available offline, powered by **Hive**.
 -   **📱 Responsive Design**: Optimized for mobile and works on web/desktop.
 
@@ -95,4 +94,4 @@ This project was developed as the final project for the **GIN528** course.
 
 ---
 
-Made with ❤️ by Ghady Mattar
+Made by Ghady Mattar
