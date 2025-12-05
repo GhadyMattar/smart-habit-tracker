@@ -68,11 +68,11 @@ Follow these steps to run the project locally.
 
 ## 📸 Screenshots
 
-*(Add your screenshots here)*
+
 
 | Home Screen | Statistics | Add Habit |
 |:---:|:---:|:---:|
-| ![Home](assets/images/home_placeholder.png) | ![Stats](assets/images/stats_placeholder.png) | ![Add](assets/images/add_placeholder.png) |
+| <img src="assets/screenshots/home_screen.png" width="250" /> | <img src="assets/screenshots/history_screen.png" width="250" /> | <img src="assets/screenshots/new_habit_screen.png" width="250" /> |
 
 ---
 
